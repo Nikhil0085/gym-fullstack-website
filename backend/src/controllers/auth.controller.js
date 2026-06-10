@@ -129,8 +129,6 @@ async function login(req, res) {
         const isPasswordCorrect = await bcrypt.compare(
             password,
             user.password
-
-        
         )
         if (!isPasswordCorrect) {
             return res.status(400).json({

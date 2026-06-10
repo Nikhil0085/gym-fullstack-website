@@ -13,7 +13,8 @@ router.post(
   authMiddleware,
   membershipPurchaseController.purchaseMembership,
 );
-
+router.get("/active", authMiddleware, membershipPurchaseController.getActiveMembership)
+router.get("/history",authMiddleware,membershipPurchaseController.getMembershipHistory)
 
 router.get("/:id", membershipController.getPlanById);
 

@@ -67,7 +67,7 @@ async function updatePlan(req, res) {
       success: true,
       updatePlan,
     });
-  } catch (errpr) {
+  } catch (error) {
   return  res.status(500).json({
       message: error.mmessage,
     });
