@@ -28,7 +28,6 @@ async function  signup (req, res) {
     const hashedPassword = await bcrypt.hash(
         password,
         10
-
     );
 
     await userModel.create({
@@ -155,7 +154,7 @@ async function login(req, res) {
              role: user.role,
            },
          });
-    } catch (err) {
+    } catch (error) {
            return res.status(500).json({
              message: error.message,
            });

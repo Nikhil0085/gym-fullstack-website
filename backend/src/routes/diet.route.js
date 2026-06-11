@@ -8,6 +8,7 @@ const authMiddleware = require("../middleware/auth.middleware");
 router.post('/createDiet', dietController.createDiet);
 router.get('/getDiets', dietController.getAllDiets);
 router.post('/assign', authMiddleware, userDietcontroller.assignDietPlan);
+router.post('/my-plan', authMiddleware, userDietcontroller.getMyDietPlan);
 router.get('/:id', dietController.getDietsbyId);
 router.put('/:id', dietController.updateDietPlan);
 router.delete('/:id', dietController.deleteDietPlan);

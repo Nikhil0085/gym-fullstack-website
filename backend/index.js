@@ -3,7 +3,8 @@ const express = require("express");
 const connectDB = require('./src/config/db')
 const authRoutes = require('./src/routes/auth.routes')
 const membershipRoutes = require('./src/routes/membership.routes')
-const dietRoutes= require('./src/routes/diet.route')
+const dietRoutes = require('./src/routes/diet.route')
+const workOutRoutes= require('./src/routes/workout.routes')
 const cors = require("cors");
 const cookieParser = require("cookie-parser");
 const app = express();
@@ -11,7 +12,8 @@ connectDB();
 app.use(express.json());
 app.use("/api/auth", authRoutes);
 app.use("/api/membership", membershipRoutes);
-app.use('/api/diet-plan',dietRoutes)
+app.use('/api/diet-plan', dietRoutes)
+app.use('/api/workout',workOutRoutes)
 
 
 app.use(cors());
