@@ -4,8 +4,9 @@ const router = express.Router();
 const membershipController = require("../controllers/membership.controller");
 const authMiddleware= require("../middleware/auth.middleware")
 const membershipPurchaseController=require('../controllers/membershipPurchase.controller');
-const membershipModel = require("../models/membership.model");
-router.post("/create", membershipController.createPlan);
+// const membershipModel = require("../models/membership.model");
+const adminMiddleware = require("../middleware/admin.middleware");
+router.post("/create",authMiddleware,adminMiddleware, membershipController.createPlan); 
 
 router.get("/allplans", membershipController.getAllPlans);
 router.post(
@@ -18,11 +19,8 @@ router.get("/history",authMiddleware,membershipPurchaseController.getMembershipH
 
 router.get("/:id", membershipController.getPlanById);
 
-router.put("/:id",membershipController.updatePlan);
+router.put("/:id",authMiddleware,adminMiddleware,membershipController.updatePlan);
 
-router.delete("/:id", membershipController.deletePlan);
-
-
-
+router.delete("/:id",authMiddleware,adminMiddleware, membershipController.deletePlan);
 
 module.exports = router;
