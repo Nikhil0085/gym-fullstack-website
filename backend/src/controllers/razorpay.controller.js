@@ -1,21 +1,22 @@
 const razorpay = require("../config/razorpay");
+
 const crypto = require("crypto");
 
-const membershipModel = require("../models/membership.model");
+const Membership = require("../models/membership.model");
 
 const MembershipPurchase = require("../models/membershipPurchase.model");
-const razorpayModel = require("../models/razorpay.model");
+
+const RazorpayPayment = require("../models/razorpay.model");
 
 async function createOrder(req, res) {
   try {
     const { membershipId } = req.body;
 
-      const membership = await membershipModel.findById(membershipId);
-     
+    const membership = await Membership.findById(membershipId);
 
     if (!membership) {
       return res.status(404).json({
-        message: "membership not found",
+        message: "Membership not found",
       });
     }
 
@@ -24,11 +25,12 @@ async function createOrder(req, res) {
 
       currency: "INR",
 
-      receipt: `membership_${Date.now()}`,
+      receipt: `receipt_${Date.now()}`,
     };
 
     const order = await razorpay.orders.create(options);
-    await razorpayModel.create({
+
+    await RazorpayPayment.create({
       user: req.user.id,
 
       membership: membershipId,
@@ -42,10 +44,12 @@ async function createOrder(req, res) {
 
     return res.status(200).json({
       success: true,
+
       order,
-      membership,
     });
   } catch (error) {
+    console.log(error);
+
     return res.status(500).json({
       message: error.message,
     });
@@ -64,7 +68,8 @@ async function verifyPayment(req, res) {
       membershipId,
     } = req.body;
 
-    const generated = crypto
+    const generatedSignature = crypto
+
       .createHmac(
         "sha256",
 
@@ -75,53 +80,53 @@ async function verifyPayment(req, res) {
 
       .digest("hex");
 
-    if (generated !== razorpay_signature) {
+    if (generatedSignature !== razorpay_signature) {
       return res.status(400).json({
-        message: "Payment verification failed",
+        message: "Invalid payment signature",
       });
     }
-    const payment = await razorpayModel.findOne({
+
+    const payment = await RazorpayPayment.findOne({
       razorpayOrderId: razorpay_order_id,
     });
-       if (!payment) {
-         return res.status(404).json({
-           message: "payment record not found",
-         });
-      }
-      if (payment.user.toString() !== req.user.id) {
-        return res.status(403).json({
-          message: "Unauthorized payment",
-        });
-      }
-      if (payment.status === "SUCCESS") {
-        return res.status(400).json({
-          message: "Payment already verified",
-        });
-      }
-   
-    const existingMembership = await MembershipPurchase.findOne({
+
+    if (!payment) {
+      return res.status(404).json({
+        message: "Payment record not found",
+      });
+    }
+
+    if (payment.user.toString() !== req.user.id) {
+      return res.status(403).json({
+        message: "Unauthorized payment",
+      });
+    }
+
+    if (payment.status === "SUCCESS") {
+      return res.status(400).json({
+        message: "Payment already verified",
+      });
+    }
+
+    const membership = await Membership.findById(membershipId);
+
+    if (!membership) {
+      return res.status(404).json({
+        message: "Membership not found",
+      });
+    }
+
+    const activeMembership = await MembershipPurchase.findOne({
       user: req.user.id,
+
       status: "ACTIVE",
     });
 
-    if (existingMembership) {
+    if (activeMembership) {
       return res.status(400).json({
-        message: "You already have an active membership",
+        message: "Already have active membership",
       });
     }
-
-      const membership = await membershipModel.findById(membershipId);
-        if (!membership) {
-          return res.status(404).json({
-            message: "membership id is not found",
-          });
-        }
-       if (payment.membership.toString() !== membershipId) {
-         return res.status(400).json({
-           message: "Invalid payment membership",
-         });
-       }
-  
 
     const startDate = new Date();
 
@@ -140,10 +145,12 @@ async function verifyPayment(req, res) {
 
       status: "ACTIVE",
     });
-    await razorpayModel.findOneAndUpdate(
+
+    await RazorpayPayment.findOneAndUpdate(
       {
         razorpayOrderId: razorpay_order_id,
       },
+
       {
         razorpayPaymentId: razorpay_payment_id,
 
@@ -157,6 +164,8 @@ async function verifyPayment(req, res) {
       message: "Payment successful. Membership activated.",
     });
   } catch (error) {
+    console.log(error);
+
     return res.status(500).json({
       message: error.message,
     });
@@ -165,5 +174,6 @@ async function verifyPayment(req, res) {
 
 module.exports = {
   createOrder,
+
   verifyPayment,
 };

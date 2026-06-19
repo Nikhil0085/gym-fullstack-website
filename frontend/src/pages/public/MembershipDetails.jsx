@@ -45,7 +45,7 @@ const MembershipDetails = () => {
 
     try {
       setPaymentLoading(true);
-
+    console.log("Membership ID:", plan._id);
       const data = await createOrder(plan._id);
 
       const options = {
@@ -87,10 +87,9 @@ console.log(import.meta.env.VITE_RAZORPAY_KEY_ID);
 
       razorpay.open();
     } catch (error) {
-      console.log(error);
-
-      alert(error.message);
-    } finally {
+  console.log(error.response?.data);
+}
+     finally {
       setPaymentLoading(false);
     }
   };

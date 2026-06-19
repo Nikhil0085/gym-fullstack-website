@@ -44,33 +44,44 @@ async function purchaseMembership(req, res) {
 }
 async function getActiveMembership(req, res) {
   try {
-    const membership = await MembershipPurchaseModel
-      .findOne({
-        user: req.user.id,
-        status: "ACTIVE",
-      })
-      .populate("membership", "name price durationInDays features");
+    const membership = await MembershipPurchaseModel.findOne({
+      user: req.user.id,
+      status: "ACTIVE",
+    }).populate("membership", "name price durationInDays features");
+
+    console.log("ACTIVE MEMBERSHIP:", membership);
+
     if (!membership) {
-      return res.status(404).json({
+      return res.status(200).json({
+        success: true,
+        hasMembership: false,
         message: "No active membership found",
       });
     }
+
     if (membership.endDate < new Date()) {
       membership.status = "EXPIRED";
 
       await membership.save();
 
-      return res.status(400).json({
+      return res.status(200).json({
+        success: true,
+        hasMembership: false,
         message: "Membership expired",
       });
     }
+
     const remainingDays = Math.ceil(
       (membership.endDate - new Date()) / (1000 * 60 * 60 * 24),
     );
 
     return res.status(200).json({
       success: true,
+
+      hasMembership: true,
+
       remainingDays,
+
       membership: {
         planName: membership.membership.name,
         price: membership.membership.price,
@@ -80,11 +91,9 @@ async function getActiveMembership(req, res) {
         status: membership.status,
       },
     });
-    // return res.status(200).json({
-    //     success: true,
-    //     membership
-    // })
   } catch (error) {
+    console.log(error);
+
     return res.status(500).json({
       message: error.message,
     });
