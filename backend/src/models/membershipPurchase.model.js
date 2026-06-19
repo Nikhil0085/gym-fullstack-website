@@ -23,7 +23,9 @@ const membershipPurchaseSchema = new mongoose.Schema(
       type: Date,
       required: true,
     },
-
+    image: {
+      type:String,
+    },
     status: {
       type: String,
       enum: ["ACTIVE", "EXPIRED", "CANCELLED"],

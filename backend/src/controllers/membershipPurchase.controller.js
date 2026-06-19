@@ -13,7 +13,7 @@ async function purchaseMembership(req, res) {
         message: "membership not found",
       });
     }
-    const existingMembership = await Membership.findOne({
+    const existingMembership = await MembershipPurchaseModel.findOne({
       user: req.user.id,
       status: "ACTIVE",
     });
