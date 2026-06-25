@@ -74,26 +74,27 @@ async function updateDietPlan(req, res) {
 }
 
 async function deleteDietPlan(req, res) {
-    try {
-        
-        const { id } = req.params;
-        const diet = await dietplanModel.findByIdAndDelete(id);
-        if (!diet) {
-            res.status(404).json({
-                message: "id not found"
-            })  
+  try {
+    const { id } = req.params;
 
-            return res.status(200).json({
-                success: true,
-                message:"diet plan deleted successfuully"
-        })
-        
+    const diet = await dietplanModel.findByIdAndDelete(id);
+
+    if (!diet) {
+      return res.status(404).json({
+        message: "Diet plan not found",
+      });
     }
-    } catch (error) {
-        return res.status(500).json({
-            message:error.message
-        })
-    }
+
+    return res.status(200).json({
+      success: true,
+
+      message: "Diet plan deleted successfully",
+    });
+  } catch (error) {
+    return res.status(500).json({
+      message: error.message,
+    });
+  }
 }
 
 module.exports = {

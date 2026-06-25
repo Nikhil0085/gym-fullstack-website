@@ -21,13 +21,10 @@ async function createOrder(req, res) {
     }
 
     const options = {
-      amount: membership.price * 100,
-
-      currency: "INR",
-
-      receipt: `receipt_${Date.now()}`,
-    };
-
+  amount: membership.price * 100,
+  currency:"INR",
+  receipt:`receipt_${Date.now()}`
+};
     const order = await razorpay.orders.create(options);
 
     await RazorpayPayment.create({

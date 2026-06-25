@@ -178,11 +178,13 @@ async function getprofile(req, res) {
 
         })
      }
- }
+}
+
 
 module.exports={
     signup,
     verifyOTP,
     login,
-  getprofile
+    getprofile,
+  
 }

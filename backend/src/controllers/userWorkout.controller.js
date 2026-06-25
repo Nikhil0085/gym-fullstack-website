@@ -8,13 +8,13 @@ async function assignWorkout(req, res) {
     
     const user =await userModel.findById(userId);
     if (!user) {
-        res.status(404).json({
+       return res.status(404).json({
             message:"user not found"
         })
     }
     const workout = await workoutmodel.findById(workoutId);
-    if (!workoutId) {
-        res.status(404).json({
+    if (!workout) {
+       return res.status(404).json({
             message:"workout is not found"
         })
     }
@@ -43,7 +43,7 @@ async function getMyworkout(req, res) {
         .populate("workoutPlan");
     
     if (!plan) {
-        res.status(404).json({
+       return res.status(404).json({
             message:"plan doesnot assigned"
         })
     }
